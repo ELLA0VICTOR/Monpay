@@ -63,8 +63,8 @@ export function AuthProvider({ children }) {
       const { data: nonceData } = await api.get(`/api/auth/nonce/${address}`);
       const nonce = nonceData.nonce;
       
-      // Create sign message
-      const message = `Sign this message to authenticate with MonPay.\n\nNonce: ${nonce}\nAddress: ${address}`;
+      // Create message in EXACT format expected by backend (lowercase address)
+      const message = `MonPay Authentication\nAddress: ${address.toLowerCase()}\nNonce: ${nonce}`;
       
       // Sign message
       const signature = await signMessageAsync({ message });
@@ -88,7 +88,7 @@ export function AuthProvider({ children }) {
       
     } catch (error) {
       console.error('Authentication failed:', error);
-      toast.error('Authentication failed: ' + (error.message || 'Unknown error'));
+      toast.error('Authentication failed: ' + (error.response?.data?.message || error.message || 'Unknown error'));
       return false;
     } finally {
       setLoading(false);
